@@ -98,12 +98,12 @@
 
   // Platform coverage meters: [label, hint, covered, total]
   var WEB = [
-    ['Elements', 'element types in the WEB editor', 49, 89],
-    ['Action steps', 'steps available in action flows', 42, 60],
-    ['Condition rules', 'operators and rule shapes', 92, 137],
-    ['Project settings', 'settings the builder can write', 34, 61],
-    ['Variables', 'variable kinds and scopes', 19, 28],
-    ['Style properties and layers', 'element properties, slots and device layers', 24, 38],
+    ['Elements', 'element types in the WEB editor', 54, 89],
+    ['Action steps', 'steps, branches and where actions run', 73, 105],
+    ['Condition rules', 'operators and rule shapes', 109, 137],
+    ['Project settings', 'settings the builder can write', 56, 61],
+    ['Variables', 'variable kinds and scopes', 23, 28],
+    ['Style properties and layers', 'element properties, slots and device layers', 36, 38],
     ['Chat edit actions', 'kinds of change you can ask for', 21, 21]
   ];
   var NB = [
