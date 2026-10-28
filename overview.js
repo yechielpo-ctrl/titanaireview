@@ -135,6 +135,16 @@
   }
   meters(WEB, 'meters-web', false);
   meters(NB, 'meters-nb', true);
+  // FORM1 -> WEB conversion: FORM1 platform census + conversion measure, Oct 28, 2026 (docs/platform-mining/form1/FORM1_COVERAGE_MATRIX.md). Fully converted only; partial items are not counted.
+  var F1 = [
+    ['Elements', 'FORM1 palette tiles rebuilt as a native WEB element', 37, 60],
+    ['Rule actions', 'rule results and global actions with a native WEB step', 18, 41],
+    ['Operators', 'rule condition operators carried exactly', 23, 26],
+    ['Calculations and variables', 'calculated values, variables and where they are read', 6, 10],
+    ['Settings', 'Form Settings tabs carried to the WEB project', 3, 20],
+    ['Integrations', 'push providers and Salesforce read / write shapes', 4, 19]
+  ];
+  meters(F1, 'meters-f1', false);
 
   // Element explorer. Per palette category: "Type:s" where s = y built by AI, s built in some routes only, h add by hand.
   var EL_WEB = {"Containers":"Accordion:y CarouselContainer:y DrawerEl:y Modal:y MultiStepper:y RepeatAutoFit:y Scroll:h Section:y Stack:y Stepper:y Tab:y TwoSideSection:h","Widget":"AddressFinder:h Badge:y BarcodeGenerator:h BarcodeReader:h Breadcrumb:y Capture:h Counter:y DateRange:h DiffViewer:h ExternalLookup:h FileViewer:s GoogleMap:s InteractiveDocument:h Kanban:h PageSearch:h Progress:y Scheduler:h SmartVLoginForm:h SmartVOtpForm:y Spreadsheet:h Stripe:s TablePricing:h TextReview:h Ticker:y Tracker:y TreeView:h VerticalCard:y infoBox:h","Media":"Animation:h ExtendedGallery:y Image:y ImageAnnotator:h InteractiveImage:y TestimonialsCarousel:y Vimeo:s YouTube:s galleryCarousel:y galleryGrid:y iframe:y","Survey":"CES:h ImageChoice:y Matrix:y Range:y Ranking:h Rating:y StarRating:y SurveyList:h TextCounter:y YesNo:h","Forms and inputs":"Form:y FormField:y CircleSlider:y Search:y ContinualForm:h titanForm:h GenieForm:h","Text, buttons and shapes":"Button:y Link:y Typography:y ItemList:h Line:y Svg:y Strip:y Component:y","Tables and charts":"PowerTable:y list:y table:y chart:h","Not in palette":"Banner:h ECommerceCartIcon:y ECommerceCatalogue:h ECommerceCategories:h ECommerceProduct:y ECommerceRelatedProducts:y FlexStrip:h PageConditionalForm:h Widget:y"};
