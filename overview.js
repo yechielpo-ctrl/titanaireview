@@ -96,55 +96,102 @@
     body.appendChild(tr);
   });
 
-  // Platform coverage meters: [label, hint, covered, total]
-  var WEB = [
-    ['Elements', 'element types in the WEB editor', 54, 89],
-    ['Action steps', 'steps, branches and where actions run', 73, 105],
-    ['Condition rules', 'operators and rule shapes', 109, 137],
-    ['Project settings', 'settings the builder can write', 56, 61],
-    ['Variables', 'variable kinds and scopes', 23, 28],
-    ['Style properties and layers', 'element properties, slots and device layers', 36, 38],
-    ['Chat edit actions', 'kinds of change you can ask for', 21, 21]
+  // Platform coverage: meters and the info popup are drawn from coverage_details.js (generated from the coverage matrices by
+  // tools/overview/gen_coverage_details.mjs), so every count equals the length of the lists behind it.
+  var DETAILS = window.TITAN_COVERAGE_DETAILS;
+  var CARDS = [
+    { key: 'web', title: 'FormTitan WEB', meters: 'meters-web', unverified: false },
+    { key: 'nb', title: 'New builder', meters: 'meters-nb', unverified: true },
+    { key: 'f1', title: 'FORM1 to WEB conversion', meters: 'meters-f1', unverified: false }
   ];
-  var NB = [
-    ['Elements', 'element types in the new builder', 61, 67],
-    ['Flow steps', 'steps available in flows', 27, 41],
-    ['Condition rules', 'counted against the WEB list', 52, 137],
-    ['Project settings', 'counted against the WEB list', 10, 61],
-    ['Variables', 'project scope, counted against the WEB list', 13, 28],
-    ['Chat edit actions', 'kinds of change you can ask for', 17, 21]
-  ];
-  function meters(list, id, unverified) {
-    var ul = document.getElementById(id);
-    list.forEach(function (m) {
-      var pct = Math.round(m[2] / m[3] * 100);
-      var li = document.createElement('li');
-      li.className = 'meter' + (unverified ? ' unverified' : '');
-      li.title = m[0] + ': ' + m[2] + ' of ' + m[3] + ' (' + pct + '%)' + (unverified ? ', from code, not yet verified live' : '');
-      var lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.textContent = m[0];
-      var sm = document.createElement('small'); sm.textContent = m[1]; lbl.appendChild(sm);
-      var val = document.createElement('div'); val.className = 'val';
-      var b = document.createElement('b'); b.textContent = pct + '%'; val.appendChild(b);
-      val.appendChild(document.createTextNode(m[2] + ' of ' + m[3]));
-      var bar = document.createElement('div'); bar.className = 'bar';
-      bar.setAttribute('role', 'img'); bar.setAttribute('aria-label', pct + ' percent');
-      var fill = document.createElement('i'); fill.style.width = pct + '%'; bar.appendChild(fill);
-      li.appendChild(lbl); li.appendChild(val); li.appendChild(bar);
-      ul.appendChild(li);
-    });
+  var GROUPS = [['planned', 'Planned'], ['partly', 'Partly converted'], ['byHand', 'Add by hand in the editor']];
+  function rowTotal(row) { return row.covered.length + row.planned.length + row.partly.length + row.byHand.length; }
+  function textEl(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function nameList(names) {
+    var ul = textEl('ul', 'cd-list');
+    names.forEach(function (n) { ul.appendChild(textEl('li', null, n)); });
+    return ul;
   }
-  meters(WEB, 'meters-web', false);
-  meters(NB, 'meters-nb', true);
-  // FORM1 -> WEB conversion: FORM1 platform census + conversion measure, Oct 28, 2026 (docs/platform-mining/form1/FORM1_COVERAGE_MATRIX.md). Fully converted only; partial items are not counted.
-  var F1 = [
-    ['Elements', 'FORM1 palette tiles rebuilt as a native WEB element', 37, 60],
-    ['Rule actions', 'rule results and global actions with a native WEB step', 18, 41],
-    ['Operators', 'rule condition operators carried exactly', 23, 26],
-    ['Calculations and variables', 'calculated values, variables and where they are read', 6, 10],
-    ['Settings', 'Form Settings tabs carried to the WEB project', 3, 20],
-    ['Integrations', 'push providers and Salesforce read / write shapes', 4, 19]
-  ];
-  meters(F1, 'meters-f1', false);
+  function detailSection(title, count, names, cls) {
+    var sec = textEl('section', 'cd-sec ' + cls);
+    sec.appendChild(textEl('h4', null, title + ' (' + count + ')'));
+    sec.appendChild(count ? nameList(names) : textEl('p', 'cd-none', 'Nothing in this group.'));
+    return sec;
+  }
+  function notYetSection(row) {
+    var count = rowTotal(row) - row.covered.length;
+    var sec = textEl('section', 'cd-sec cd-not');
+    sec.appendChild(textEl('h4', null, 'Not yet (' + count + ')'));
+    if (!count) sec.appendChild(textEl('p', 'cd-none', 'Nothing left in this group.'));
+    GROUPS.forEach(function (g) {
+      if (!row[g[0]].length) return;
+      sec.appendChild(textEl('h5', null, g[1] + ' (' + row[g[0]].length + ')'));
+      sec.appendChild(nameList(row[g[0]]));
+    });
+    return sec;
+  }
+  var dialog = document.getElementById('cov-dialog');
+  var lastOpener = null;
+  function openDetails(card, row, opener) {
+    var data = DETAILS[card.key];
+    var total = rowTotal(row);
+    var body = document.getElementById('cov-dialog-body');
+    body.textContent = '';
+    document.getElementById('cov-dialog-title').textContent = card.title + ': ' + row.label;
+    var sub = row.covered.length + ' of ' + total + ' covered (' + Math.round(row.covered.length / total * 100) + '%) - measured ' + data.measured;
+    body.appendChild(textEl('p', 'cd-sub', sub));
+    if (row.newBuilder) {
+      var nb = row.newBuilder;
+      body.appendChild(textEl('p', 'cd-nb', 'In the new builder (early access): ' + nb.covered + ' of ' + nb.total + ' covered' + (nb.byHand ? ', ' + nb.byHand + ' have no native counterpart and are added by hand' : '') + '.'));
+    }
+    body.appendChild(detailSection('Covered', row.covered.length, row.covered, 'cd-yes'));
+    body.appendChild(notYetSection(row));
+    body.appendChild(textEl('p', 'cd-foot', 'Anything not covered can still be added by hand in the editor.'));
+    lastOpener = opener;
+    if (dialog.showModal) dialog.showModal(); else dialog.setAttribute('open', '');
+    body.scrollTop = 0;
+  }
+  function closeDetails() {
+    if (dialog.close) dialog.close(); else dialog.removeAttribute('open');
+    if (lastOpener) lastOpener.focus();
+  }
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) closeDetails(); });
+  dialog.addEventListener('cancel', function (e) { e.preventDefault(); closeDetails(); });
+  document.getElementById('cov-dialog-close').addEventListener('click', closeDetails);
+  function meterRow(card, row) {
+    var total = rowTotal(row), covered = row.covered.length;
+    var pct = Math.round(covered / total * 100);
+    var li = document.createElement('li');
+    li.className = 'meter' + (card.unverified ? ' unverified' : '');
+    li.title = row.label + ': ' + covered + ' of ' + total + ' (' + pct + '%)' + (card.unverified ? ', from code, not yet verified live' : '');
+    var lbl = textEl('div', 'lbl', row.label);
+    var info = textEl('button', 'cov-info', 'i');
+    info.type = 'button';
+    info.setAttribute('aria-label', 'What is covered in ' + row.label);
+    info.setAttribute('aria-haspopup', 'dialog');
+    info.addEventListener('click', function () { openDetails(card, row, info); });
+    lbl.appendChild(info);
+    lbl.appendChild(textEl('small', null, row.hint));
+    var val = textEl('div', 'val');
+    val.appendChild(textEl('b', null, pct + '%'));
+    val.appendChild(document.createTextNode(covered + ' of ' + total));
+    var bar = textEl('div', 'bar');
+    bar.setAttribute('role', 'img'); bar.setAttribute('aria-label', pct + ' percent');
+    var fill = document.createElement('i'); fill.style.width = pct + '%'; bar.appendChild(fill);
+    li.appendChild(lbl); li.appendChild(val); li.appendChild(bar);
+    return li;
+  }
+  CARDS.forEach(function (card) {
+    var ul = document.getElementById(card.meters);
+    DETAILS[card.key].rows.forEach(function (row) { ul.appendChild(meterRow(card, row)); });
+  });
+  // Header dates and the FORM1 partial counts come from the same data.
+  document.getElementById('cov-web-date').textContent = 'Platform census, ' + DETAILS.web.measured;
+  document.getElementById('cov-nb-date').textContent = 'Early access · builder code, ' + DETAILS.nb.measured;
+  document.getElementById('cov-f1-date').textContent = 'Measured ' + DETAILS.f1.measured;
+  document.getElementById('cov-f1-partial').textContent = DETAILS.f1.rows.map(function (r, i) {
+    return r.partly.length + ' ' + ['elements', 'rule actions', 'operators', 'calculations', 'settings tabs', 'integrations'][i];
+  }).join(', ');
 
   // Element explorer. Per palette category: "Type:s" where s = y built by AI, s built in some routes only, h add by hand.
   var EL_WEB = {"Containers":"Accordion:y CarouselContainer:y DrawerEl:y Modal:y MultiStepper:y RepeatAutoFit:y Scroll:h Section:y Stack:y Stepper:y Tab:y TwoSideSection:h","Widget":"AddressFinder:h Badge:y BarcodeGenerator:h BarcodeReader:h Breadcrumb:y Capture:h Counter:y DateRange:h DiffViewer:h ExternalLookup:h FileViewer:s GoogleMap:s InteractiveDocument:h Kanban:h PageSearch:h Progress:y Scheduler:h SmartVLoginForm:h SmartVOtpForm:y Spreadsheet:h Stripe:s TablePricing:h TextReview:h Ticker:y Tracker:y TreeView:h VerticalCard:y infoBox:h","Media":"Animation:h ExtendedGallery:y Image:y ImageAnnotator:h InteractiveImage:y TestimonialsCarousel:y Vimeo:s YouTube:s galleryCarousel:y galleryGrid:y iframe:y","Survey":"CES:h ImageChoice:y Matrix:y Range:y Ranking:h Rating:y StarRating:y SurveyList:h TextCounter:y YesNo:h","Forms and inputs":"Form:y FormField:y CircleSlider:y Search:y ContinualForm:h titanForm:h GenieForm:h","Text, buttons and shapes":"Button:y Link:y Typography:y ItemList:h Line:y Svg:y Strip:y Component:y","Tables and charts":"PowerTable:y list:y table:y chart:h","Not in palette":"Banner:h ECommerceCartIcon:y ECommerceCatalogue:h ECommerceCategories:h ECommerceProduct:y ECommerceRelatedProducts:y FlexStrip:h PageConditionalForm:h Widget:y"};
