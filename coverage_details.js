@@ -45,7 +45,6 @@ window.TITAN_COVERAGE_DETAILS = {
      "Extended gallery",
      "Ticker",
      "Gallery grid",
-     "Component",
      "Counter",
      "Google map",
      "Image choice",
@@ -87,6 +86,7 @@ window.TITAN_COVERAGE_DETAILS = {
      "Info box",
      "Titan form",
      "Capture",
+     "Component",
      "Continual form",
      "Scheduler",
      "Scroll",
@@ -157,6 +157,7 @@ window.TITAN_COVERAGE_DETAILS = {
      "Project interface actions",
      "Actions run from first page load",
      "Actions run from element open",
+     "Actions run from Salesforce push conditions",
      "Branch: on finish",
      "Branch: valid",
      "Branch: invalid",
@@ -183,7 +184,6 @@ window.TITAN_COVERAGE_DETAILS = {
     "planned": [
      "Branch: while running",
      "Branch: close button",
-     "Actions run from Salesforce push conditions",
      "Branch: verification valid",
      "Branch: start invalid",
      "Branch: sign-in invalid",
@@ -394,10 +394,11 @@ window.TITAN_COVERAGE_DETAILS = {
      "Synced variables",
      "Custom loader",
      "Page loader",
-     "Salesforce push",
-     "Salesforce mapping",
      "Theme",
      "Header",
+     "Captions",
+     "Salesforce push",
+     "Salesforce mapping",
      "Project assets",
      "Footer",
      "SmartV sign-in",
@@ -421,7 +422,6 @@ window.TITAN_COVERAGE_DETAILS = {
      "Project disabled",
      "Availability",
      "Salesforce platform events",
-     "Captions",
      "Drawer defaults",
      "Loading screen"
     ],
@@ -456,6 +456,7 @@ window.TITAN_COVERAGE_DETAILS = {
      "Variables panel: formula fields",
      "Variables panel: variables",
      "System value: today",
+     "System value: a random value",
      "System value: the device type",
      "System value: the IP address",
      "System value: the project ID",
@@ -464,7 +465,6 @@ window.TITAN_COVERAGE_DETAILS = {
      "Variables panel: conditions"
     ],
     "planned": [
-     "System value: a random value",
      "System value: the Salesforce event session",
      "System value: the date as dd-mm-yyyy",
      "System value: the browser",
@@ -554,7 +554,7 @@ window.TITAN_COVERAGE_DETAILS = {
   ]
  },
  "nb": {
-  "measured": "Oct 29, 2026",
+  "measured": "Oct 30, 2026",
   "rows": [
    {
     "label": "Elements",
@@ -841,10 +841,10 @@ window.TITAN_COVERAGE_DETAILS = {
      "Project styles",
      "Theme",
      "Header",
+     "Captions",
      "Runtime options",
      "Project store",
      "Availability",
-     "Captions",
      "Drawer defaults"
     ],
     "planned": [
@@ -920,12 +920,12 @@ window.TITAN_COVERAGE_DETAILS = {
      "Variable type: custom JavaScript",
      "Variables panel: formula fields",
      "Variables panel: variables",
+     "System value: a random value",
      "Variables panel: environment",
      "Variables panel: files",
      "Variables panel: conditions"
     ],
     "planned": [
-     "System value: a random value",
      "System value: the Salesforce event session",
      "System value: the date as dd-mm-yyyy",
      "System value: the browser",
