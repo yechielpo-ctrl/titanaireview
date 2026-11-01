@@ -573,7 +573,7 @@ window.TITAN_COVERAGE_DETAILS = {
   ]
  },
  "nb": {
-  "measured": "Nov 1, 2026",
+  "measured": "Nov 2, 2026",
   "rows": [
    {
     "label": "Elements",
