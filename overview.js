@@ -104,8 +104,8 @@
     { key: 'nb', title: 'New builder', meters: 'meters-nb', unverified: true },
     { key: 'f1', title: 'FORM1 to WEB conversion', meters: 'meters-f1', unverified: false }
   ];
-  var GROUPS = [['planned', 'Planned'], ['partly', 'Partly converted'], ['byHand', 'Add by hand in the editor']];
-  function rowTotal(row) { return row.covered.length + row.planned.length + row.partly.length + row.byHand.length; }
+  var GROUPS = [['sampleOnly', 'Built, but not yet studied on the platform'], ['minedNotBuilt', 'Studied on the platform, not built yet'], ['notMined', 'Not studied on the platform yet'], ['planned', 'Planned'], ['partly', 'Partly converted'], ['byHand', 'Add by hand in the editor']];
+  function rowTotal(row) { return GROUPS.reduce(function (sum, g) { return sum + (row[g[0]] ? row[g[0]].length : 0); }, row.covered.length); }
   function textEl(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function nameList(names) {
     var ul = textEl('ul', 'cd-list');
@@ -124,7 +124,7 @@
     sec.appendChild(textEl('h4', null, 'Not yet (' + count + ')'));
     if (!count) sec.appendChild(textEl('p', 'cd-none', 'Nothing left in this group.'));
     GROUPS.forEach(function (g) {
-      if (!row[g[0]].length) return;
+      if (!row[g[0]] || !row[g[0]].length) return;
       sec.appendChild(textEl('h5', null, g[1] + ' (' + row[g[0]].length + ')'));
       sec.appendChild(nameList(row[g[0]]));
     });
@@ -140,6 +140,7 @@
     document.getElementById('cov-dialog-title').textContent = card.title + ': ' + row.label;
     var sub = row.covered.length + ' of ' + total + ' covered (' + Math.round(row.covered.length / total * 100) + '%) - measured ' + data.measured;
     body.appendChild(textEl('p', 'cd-sub', sub));
+    if (row.note) body.appendChild(textEl('p', 'cd-nb', row.note));
     if (row.newBuilder) {
       var nb = row.newBuilder;
       body.appendChild(textEl('p', 'cd-nb', 'In the new builder (early access): ' + nb.covered + ' of ' + nb.total + ' covered' + (nb.byHand ? ', ' + nb.byHand + ' have no native counterpart and are added by hand' : '') + '.'));
